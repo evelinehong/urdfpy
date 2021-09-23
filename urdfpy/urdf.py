@@ -59,11 +59,14 @@ class URDFType(object):
         val : :class:`object`
             The parsed attribute.
         """
-        if val_type == np.ndarray:
-            val = np.fromstring(val, sep=' ')
-        else:
-            val = val_type(val)
-        return val
+        try:
+            if val_type == np.ndarray:
+                val = np.fromstring(val, sep=' ')
+            else:
+                val = val_type(val)
+            return val
+        except:
+            return 100.0
 
     @classmethod
     def _parse_simple_attribs(cls, node):
@@ -87,10 +90,12 @@ class URDFType(object):
             if r:
                 try:
                     v = cls._parse_attrib(t, node.attrib[a])
-                except Exception:
-                    raise ValueError(
+                except:
+                    v = 100.0
+                    import warnings
+                    warnings.warn(
                         'Missing required attribute {} when parsing an object '
-                        'of type {}'.format(a, cls.__name__)
+                        'of type {}, default to 100.0'.format(a, cls.__name__)
                     )
             else:
                 v = None
